@@ -13,6 +13,7 @@ body {
 }
 
 .main {
+	background: -webkit-gradient(linear, left top, right bottom, from(#aaa), color-stop(13%, #aaa), color-stop(57%, #ccc), color-stop(79%, #eee), to(#eee));
 	background: linear-gradient(135deg, #aaa 13%, #ccc 57%, #eee 79%);
 	margin: 0 auto;
 	height: 100%;
