@@ -1,0 +1,11 @@
+.main {
+	background: -webkit-radial-gradient(center, ellipse cover, #ffffff 0%,#f4ff32 20%,#ff0000 100%);
+	background: radial-gradient(ellipse at center, #ffffff 0%,#f4ff32 20%,#ff0000 100%);
+}
+
+.cell {
+	border: 0;
+	transition: left 1s, top 1s, background-color 1s, box-shadow 1s;
+	-webkit-transition: left 1s, top 1s, background-color 1s, box-shadow 1s;
+}
+
