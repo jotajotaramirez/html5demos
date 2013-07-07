@@ -5,20 +5,27 @@
 
 html,
 body {
+	overflow: hidden;
 	margin: 0;
 	padding: 0;
 	height: 100%;
 	width: 100%;
 }
 
-#main {
-	background-color: blue;
+.main {
+	background: linear-gradient(135deg, #aaa 13%, #ccc 57%, #eee 79%);
 	margin: 0 auto;
 	height: 100%;
-	width: 50%;
-	transition: width 2s;
+	width: 100%;
 }
 
-#main.grow {
-	width: 100%;
+.cell {
+	border: 1px solid #000;
+	border-radius: 50%;
+	box-shadow: -0.5em -0.5em 1em rgba(0, 0, 0, 0.2);
+	position: absolute;
+	height: 5%;
+	width: 5%;
+	transition: left 1s, top 1s, background-color 1s;
+	-webkit-transition: left 1s, top 1s, background-color 1s;
 }

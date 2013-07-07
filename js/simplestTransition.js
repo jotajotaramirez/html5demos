@@ -5,6 +5,6 @@
 
 $(function() {
 	setTimeout(function() {
-		$("#main").addClass("grow");
+		$(".main").addClass("grow");
 	}, 2000);
 });

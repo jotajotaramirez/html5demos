@@ -1,0 +1,10 @@
+.simplestTransition .main {
+	background-color: blue;
+	width: 50%;
+	transition: width 2s;
+	-webkit-transition: width 2s;
+}
+
+.simplestTransition .grow {
+	width: 100%;
+}
