@@ -7,14 +7,18 @@ var randomNumber = function(max) {
 	return Math.floor(Math.random() * max);
 }
 
-var randomRange = function(min, max) {
+var randomRangeFloat = function(min, max) {
 	if (max < min) {
 		var temp = max;
 		max = min;
 		min = temp;
 	}
 
-	return Math.floor((Math.random() * (max - min)) + min);
+	return (Math.random() * (max - min)) + min;
+}
+
+var randomRange = function(min, max) {
+	return Math.floor(randomRangeFloat(min, max));
 }
 
 var randomColor = function() {

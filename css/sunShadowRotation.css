@@ -1,0 +1,39 @@
+/*
+	Author: Juan José Ramírez Escribano @jotajotaramirez
+	Date: 07 July 2013
+*/
+
+@keyframes orbitRotation {
+	100% {
+		transform: rotateZ(360deg);
+	}
+}
+
+@-webkit-keyframes orbitRotation {
+	100% {
+		-webkit-transform: rotateZ(360deg);
+	}
+}
+
+
+.cellWrapper {
+	-webkit-animation-name: orbitRotation;
+	-webkit-animation-timing-function: linear;
+	-webkit-animation-delay: 2s;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-direction: normal;
+	-webkit-animation-play-state: running;
+
+	animation-name: orbitRotation;
+	animation-timing-function: linear;
+	animation-delay: 2s;
+	animation-iteration-count: infinite;
+	animation-direction: normal;
+	animation-play-state: running;
+
+	
+	height: 100%;
+	margin: 0 auto;
+	position: absolute;
+}
+
