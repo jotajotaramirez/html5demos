@@ -1,0 +1,16 @@
+.cell {
+	border: 1px solid #000;
+	border-radius: 50%;
+	box-shadow: -0.5em -0.5em 1em rgba(0, 0, 0, 0.2);
+	position: absolute;
+	height: 5%;
+	width: 5%;
+	transition: left 1s, top 1s, background-color 1s;
+	-webkit-transition: left 1s, top 1s, background-color 1s;
+}
+
+.maintainAspectRatio .cell {
+	height: auto;
+	width: 5%;
+	padding-bottom: 5%;
+}
