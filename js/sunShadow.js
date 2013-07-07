@@ -16,7 +16,7 @@ $(function() {
 	Cell.prototype = {
 		'render': function(parent) {
 			if (this.DOMelement === undefined) {
-				this.DOMelement = $(document.createElement('div')).addClass('cell');
+				this.DOMelement = $(document.createElement('div')).addClass('cell').css('background-color', this.backgroundColor);
 				parent.append(this.DOMelement);
 			}
 			var distanceFromSun = {
@@ -35,9 +35,9 @@ $(function() {
 						(0.5 - (this.y / 100)) + 'em ' +
 						'1em rgba(0, 0, 0, 0.8)';
 
-			this.DOMelement.css('left', this.x + "%")
+			this.DOMelement
+				.css('left', this.x + "%")
 				.css('top', this.y + "%")
-				.css('background-color', this.backgroundColor)
 				.css('box-shadow', shadow);
 		}
 	}
