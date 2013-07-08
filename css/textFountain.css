@@ -1,0 +1,24 @@
+/*
+	Author: Juan José Ramírez Escribano @jotajotaramirez
+	Date: 08 July 2013
+*/
+
+@font-face {
+	font-family: advert_regular;
+	src: url('../fonts/advert_regular.ttf');
+}
+
+.textFountain .main {
+	background: -webkit-linear-gradient(top, #7db9e8 0%,#1e5799 100%);
+	background: linear-gradient(to bottom, #7db9e8 0%,#1e5799 100%);
+}
+
+.letter {
+	color: #fff;
+	font-family: advert_regular,verdana,arial,helvetica,sans-serif;
+	font-size: 5vw;
+	left: 50%;
+	position: absolute;
+	text-shadow: 0 0 0.2em #22a, 0 0 0.2em #22a, 0 0 0.2em #22a;
+	top: 50%;
+}
