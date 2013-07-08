@@ -183,7 +183,7 @@
 
 .main {
 	background: black url('../images/star-space-tile.jpg') repeat fixed top left;
-	background-size: content;
+	background-size: 30%;
 }
 
 /* These are styles to center vertically a cell if there is no cellWrapper. Just use position: absolute
