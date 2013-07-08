@@ -4,8 +4,8 @@
 */
 
 $(function() {
-	var NUM_CELLS = 10;
-	var SHADOW_OFFSET_MULTIPLER = 3;
+	var NUM_CELLS = 5;
+	var ANIMATION_DURATION_MULTIPLIER = 20;
 
 	var Cell = function(orbitRadius, backgroundColor) {
 		this.orbitRadius = orbitRadius;
@@ -17,31 +17,21 @@ $(function() {
 			if (this.DOMelement === undefined) {
 				this.DOMelement = $(document.createElement('div'))
 					.addClass('cellWrapper')
-					.css('width', this.orbitRadius + "%")
-					.css('left', ((100 - this.orbitRadius) / 2) + "%")
-					.css('animation-duration', randomRangeFloat(1.0, 5.0) + 's');
+					.css('padding', '0 ' + (this.orbitRadius / 2) + "%");
 				parent.append(this.DOMelement);
-
-				var shadow = ((this.orbitRadius / -100) * SHADOW_OFFSET_MULTIPLER) + 'em 0em ' +
-						(this.orbitRadius / 20) + 'em rgba(0, 0, 0, 0.8)' +
-					', inset ' +
-						(this.orbitRadius / 100) + 'em ' +
-						'0em 1em rgba(0, 0, 0, 0.8)';
 
 				this.DOMelement.append($(document.createElement('div'))
 					.addClass('cell')
 					.css('background-color', this.backgroundColor)
-					.css('top', (47.5 - (this.orbitRadius * 0.05)) + "%")
-					.css('box-shadow', shadow));
-
+					.css('animation-duration', ((1 - (this.orbitRadius / 100)) * ANIMATION_DURATION_MULTIPLIER) + 's'));
 			}
 		}
 	}
 
 	var cells = [];
-	var main = $('.main');
+	var main = $('.mainWrapper');
 	for (var i = 0; i < NUM_CELLS; i++) {
-		var cell = new Cell(randomRange(30, 70), 'rgba(' + randomRange(100, 255) + ', 0, 0, 1.0)');
+		var cell = new Cell((i / NUM_CELLS * 100) + 10, 'rgba(' + randomRange(200, 255) + ', 0, 0, 1.0)');
 		cell.render(main);
 		cells.push(cell);
 	}

@@ -1,0 +1,195 @@
+/*
+	Author: Juan José Ramírez Escribano @jotajotaramirez
+	Date: 08 July 2013
+	"Orbital" effect is better with a combination of scale and z-index. You can try the effect
+	with just translateZ, but it looks worse.
+*/
+
+@keyframes orbitRotation {
+	0% {
+		box-shadow: inset 0.5em 0 0.5em rgba(0, 0, 0, 0.8);
+		left: 0%;
+		z-index: 5;
+		animation-timing-function: ease-in;
+		transform: scale(1, 1);
+	}
+
+	23% {
+		box-shadow: inset 5em 0 0.5em rgba(0, 0, 0, 0.8);
+		left: 50%;
+		z-index: 10;
+		animation-timing-function: ease-out;
+		transform: scale(2, 2);
+	}
+
+	24% {
+		box-shadow: inset 5em 0 5em rgba(0, 0, 0, 0.8);
+	}
+
+	26% {
+		box-shadow: inset -5em 0 5em rgba(0, 0, 0, 0.8);
+	}
+
+	27% {
+		box-shadow: inset -5em 0 0.5em rgba(0, 0, 0, 0.8);
+	}
+
+	50% {
+		box-shadow: inset -0.5em 0 0.5em rgba(0, 0, 0, 0.8);
+		left: 100%;
+		z-index: 5;
+		animation-timing-function: ease-in;
+		transform: scale(1, 1);
+	}
+
+	75% {
+		box-shadow: inset 0 0 0.5em rgba(0, 0, 0, 0.8);
+		left: 50%;
+		z-index: 0;
+		animation-timing-function: ease-out;
+		transform: scale(0.5, 0.5);
+	}
+
+	100% {
+		box-shadow: inset 0.5em 0 0.5em rgba(0, 0, 0, 0.8);
+		left: 0%;
+		z-index: 5;
+		animation-timing-function: ease-in;
+		transform: scale(1, 1);
+	}
+}
+
+@-webkit-keyframes orbitRotation {
+	0% {
+		box-shadow: inset 0.5em 0 0.5em rgba(0, 0, 0, 0.8);
+		left: 0%;
+		z-index: 5;
+		-webkit-animation-timing-function: ease-in;
+		-webkit-transform: scale(1, 1);
+	}
+
+	23% {
+		box-shadow: inset 5em 0 0.5em rgba(0, 0, 0, 0.8);
+		left: 50%;
+		z-index: 10;
+		-webkit-animation-timing-function: ease-out;
+		-webkit-transform: scale(2, 2);
+	}
+
+	24% {
+		box-shadow: inset 5em 0 5em rgba(0, 0, 0, 0.8);
+	}
+
+	26% {
+		box-shadow: inset -5em 0 5em rgba(0, 0, 0, 0.8);
+	}
+
+	27% {
+		box-shadow: inset -5em 0 0.5em rgba(0, 0, 0, 0.8);
+	}
+
+	50% {
+		box-shadow: inset -0.5em 0 0.5em rgba(0, 0, 0, 0.8);
+		left: 100%;
+		z-index: 5;
+		-webkit-animation-timing-function: ease-in;
+		-webkit-transform: scale(1, 1);
+	}
+
+	75% {
+		box-shadow: inset 0 0 0.5em rgba(0, 0, 0, 0.8);
+		left: 50%;
+		z-index: 0;
+		-webkit-animation-timing-function: ease-out;
+		-webkit-transform: scale(0.5, 0.5);
+	}
+
+	100% {
+		box-shadow: inset 0.5em 0 0.5em rgba(0, 0, 0, 0.8);
+		left: 0%;
+		z-index: 5;
+		-webkit-animation-timing-function: ease-in;
+		-webkit-transform: scale(1, 1);
+	}
+}
+
+@keyframes orbitAll {
+	100% {
+		transform: rotateZ(360deg);
+	}
+}
+
+@-webkit-keyframes orbitAll {
+	100% {
+		-webkit-transform: rotateZ(360deg);
+	}
+}
+
+
+.maintainAspectRatio .cell,
+.mainWrapper {	
+	-webkit-animation-delay: 2s;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-direction: normal;
+	-webkit-animation-play-state: running;
+
+	animation-delay: 2s;
+	animation-iteration-count: infinite;
+	animation-direction: normal;
+	animation-play-state: running;
+}
+
+.mainWrapper {
+	-webkit-animation-name: orbitAll;
+	-webkit-animation-timing-function: linear;
+	-webkit-animation-duration: 10s;
+	animation-name: orbitAll;
+	animation-timing-function: linear;
+	animation-duration: 10s;
+
+	position: absolute;
+	height: 100%;
+	width: 100%;
+}
+
+.cellWrapper {
+	height: 100%;
+	left: 0;
+	position: absolute;
+	right: 0;
+
+}
+
+.maintainAspectRatio .cell {
+	-webkit-animation-name: orbitRotation;
+	animation-name: orbitRotation;
+
+	box-shadow: inset 0.5em 0 0.5em rgba(0, 0, 0, 0.8);
+	margin-top: -2.5%;
+	position: relative;
+	top: 50%;
+}
+
+.maintainAspectRatio  .sun {
+	-webkit-animation-name: none;
+	animation-name: none;
+
+	box-shadow: inset 0 0 1em rgba(0, 0, 0, 0.8);
+	background-color: yellow;
+	left: 47.5%;
+	position: absolute;
+	z-index: 5
+}
+
+.main {
+	background: black url('../images/star-space-tile.jpg') repeat fixed top left;
+	background-size: 30%;
+}
+
+/* These are styles to center vertically a cell if there is no cellWrapper. Just use position: absolute
+.maintainAspectRatio .cell {
+	margin-top: -2.5%;
+	position: absolute;
+	top: 50%;
+}
+*/
