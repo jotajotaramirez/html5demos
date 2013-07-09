@@ -16,6 +16,15 @@ $(function() {
 	inMemoryCanvas.width = TILE_WIDTH;
 	inMemoryCanvas.height = TILE_HEIGHT;
 
+	window.crossBrowserRequestAnimationFrame = (function(){
+	  return  window.requestAnimationFrame       ||
+	          window.webkitRequestAnimationFrame ||
+	          window.mozRequestAnimationFrame    ||
+	          function( callback ){
+	            window.setTimeout(callback, 1000 / 60);
+	          };
+	})();
+
 
 	/* Render drawing pixel per pixel */
 	var drawPixelPerPixel = function() {
@@ -111,7 +120,7 @@ $(function() {
 		*/
 
 		drawFunction();
-		window.requestAnimationFrame(drawLoop);
+		window.crossBrowserRequestAnimationFrame(drawLoop);
 	}
 
 	drawLoop(0);
