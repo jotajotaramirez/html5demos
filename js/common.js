@@ -4,7 +4,7 @@
 */
 
 var randomNumber = function(max) {
-	return Math.floor(Math.random() * max);
+	return Math.round(Math.random() * max);
 }
 
 var randomRangeFloat = function(min, max) {
@@ -18,9 +18,9 @@ var randomRangeFloat = function(min, max) {
 }
 
 var randomRange = function(min, max) {
-	return Math.floor(randomRangeFloat(min, max));
+	return Math.round(randomRangeFloat(min, max));
 }
 
 var randomColor = function() {
-	return "#" + Math.floor(Math.random() * 0xffffff).toString(16);
+	return "#" + Math.round(Math.random() * 0xffffff).toString(16);
 }

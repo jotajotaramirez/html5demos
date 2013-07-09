@@ -16,6 +16,9 @@ $(function() {
 	inMemoryCanvas.width = TILE_WIDTH;
 	inMemoryCanvas.height = TILE_HEIGHT;
 
+	var inMemoryCanvasArray = [],
+		CANVAS_ARRAY_LENGTH = 40; // The higher, the more randomness for drawUsingTiles3 function and more memory usage
+
 	window.crossBrowserRequestAnimationFrame = (function(){
 	  return  window.requestAnimationFrame       ||
 	          window.webkitRequestAnimationFrame ||
@@ -56,16 +59,13 @@ $(function() {
 			}
 		}
 
-		context.clearRect(0, 0, width, height);
-
-		for (var x = 0; x < width; x += TILE_WIDTH) {
-			for (var y = 0; y < height; y += TILE_HEIGHT) {
-				context.drawImage(inMemoryCanvas, x, y);
-			}
-		}
+		var pattern = context.createPattern(inMemoryCanvas,"repeat");
+		context.rect(0, 0, width, height);
+		context.fillStyle = pattern;
+		context.fill();
 	}
 
-	/* Draw a tile using a image */
+	/* Draw a tile using a ImageData object. Here STEP parameter is not used */
 	var drawUsingTiles2 = function() {
 		var width = context.canvas.width = canvas.width();
 		var height = context.canvas.height = canvas.height();
@@ -86,11 +86,39 @@ $(function() {
 			tileData[i + 3] = 255;
 		}
 
-		context.clearRect(0, 0, width, height);
-
 		for (var x = 0; x < width; x += TILE_WIDTH) {
 			for (var y = 0; y < height; y += TILE_HEIGHT) {
 				context.putImageData(tile, x, y);
+			}
+		}
+	}
+
+	/* Draw a tile using a set of temporal canvas */
+	var drawUsingTiles3 = function() {
+		var width = context.canvas.width = canvas.width();
+		var height = context.canvas.height = canvas.height();
+
+		if (inMemoryCanvasArray.length != CANVAS_ARRAY_LENGTH) {
+			alert("I'm going to create aux canvas array. This may take up to 1 minute, please wait");
+			for (var i = 0; i < CANVAS_ARRAY_LENGTH; i++) {
+				var canvasDOM = document.createElement('canvas'),
+					canvasDOMContext = canvasDOM.getContext('2d');
+					canvasDOM.width = TILE_WIDTH;
+					canvasDOM.height = TILE_HEIGHT;
+				for (var x = 0; x < TILE_WIDTH; x += STEP) {
+					for (var y = 0; y < TILE_HEIGHT; y += STEP) {
+						if (Math.random() > 0.5) {
+							canvasDOMContext.fillRect(x, y, STEP, STEP);
+						}
+					}
+				}
+				inMemoryCanvasArray.push(canvasDOM);
+			}
+		}
+
+		for (var x = 0; x < width; x += TILE_WIDTH) {
+			for (var y = 0; y < height; y += TILE_HEIGHT) {
+				context.drawImage(inMemoryCanvasArray[randomRange(0, CANVAS_ARRAY_LENGTH - 1)], x, y);
 			}
 		}
 	}
@@ -104,8 +132,11 @@ $(function() {
 	else if (renderType == 2) {
 		drawFunction = drawUsingTiles1;
 	}
+	else if (renderType == 3) {
+		drawFunction = drawUsingTiles2;
+	}
 	else {
-		drawFunction = drawUsingTiles2;	
+		drawFunction = drawUsingTiles3;	
 	}
 
 	function drawLoop(timeStamp) {
