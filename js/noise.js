@@ -19,21 +19,11 @@ $(function() {
 	var inMemoryCanvasArray = [],
 		CANVAS_ARRAY_LENGTH = 40; // The higher, the more randomness for drawUsingTiles3 function and more memory usage
 
-	window.crossBrowserRequestAnimationFrame = (function(){
-	  return  window.requestAnimationFrame       ||
-	          window.webkitRequestAnimationFrame ||
-	          window.mozRequestAnimationFrame    ||
-	          function( callback ){
-	            window.setTimeout(callback, 1000 / 60);
-	          };
-	})();
-
-
 	/* Render drawing pixel per pixel */
 	var drawPixelPerPixel = function() {
-		var width = context.canvas.width = canvas.width();
+		var width = context.canvas.width = canvas.width(); // clearRect not needed when reset the width or height
 		var height = context.canvas.height = canvas.height();
-		context.clearRect(0, 0, width, height);
+		
 		context.fillStyle = '#000';
 
 		for (var x = 0; x < width; x += STEP) {
@@ -47,7 +37,7 @@ $(function() {
 
 	/* Draw a tile using a temporal canvas */
 	var drawUsingTiles1 = function() {
-		var width = context.canvas.width = canvas.width();
+		var width = context.canvas.width = canvas.width(); // clearRect not needed when reset the width or height
 		var height = context.canvas.height = canvas.height();
 
 		inMemoryCanvasContext.clearRect(0, 0, TILE_WIDTH, TILE_HEIGHT);
@@ -67,7 +57,7 @@ $(function() {
 
 	/* Draw a tile using a ImageData object. Here STEP parameter is not used */
 	var drawUsingTiles2 = function() {
-		var width = context.canvas.width = canvas.width();
+		var width = context.canvas.width = canvas.width(); // clearRect not needed when reset the width or height
 		var height = context.canvas.height = canvas.height();
 
 		var tile = context.createImageData(TILE_WIDTH, TILE_HEIGHT);
@@ -95,7 +85,7 @@ $(function() {
 
 	/* Draw a tile using a set of temporal canvas */
 	var drawUsingTiles3 = function() {
-		var width = context.canvas.width = canvas.width();
+		var width = context.canvas.width = canvas.width(); // clearRect not needed when reset the width or height
 		var height = context.canvas.height = canvas.height();
 
 		if (inMemoryCanvasArray.length != CANVAS_ARRAY_LENGTH) {

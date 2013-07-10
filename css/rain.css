@@ -1,0 +1,17 @@
+/*
+	Author: Juan José Ramírez Escribano @jotajotaramirez
+	Date: 10 July 2013
+*/
+
+body {
+	background-color: #000;
+}
+
+.main {
+	background: none;
+}
+
+canvas {
+	height: 100%;
+	width: 100%;
+}
