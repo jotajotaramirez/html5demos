@@ -7,6 +7,7 @@ $(function() {
 	var canvas = $('canvas');
 	var context = canvas.get(0).getContext('2d');
 	var NUM_DROPS = canvas.width();
+	var MAX_DROP_FLOOR_SIZE = 5;
 	var wind = 0;
 
 	var Drop = function(x, y, speedX, maxFall) {
@@ -43,7 +44,7 @@ $(function() {
 			if (this.y + this.height >= this.maxFall) {
 				this.dropRadius += this.speedY / 10;
 
-				if (this.dropRadius > 2) { // reset
+				if (this.dropRadius > MAX_DROP_FLOOR_SIZE) { // reset
 					this.y = randomRange(-500, 0);
 					this.dropRadius = 0;
 					this.step = 0;
@@ -67,7 +68,7 @@ $(function() {
 			}
 
 			if (this.y + this.height >= this.maxFall) {
-				context.strokeStyle = 'rgba(255, 255, 255, ' + (1 - (this.dropRadius / 2)) + ')';
+				context.strokeStyle = 'rgba(255, 255, 255, ' + (1 - (this.dropRadius / MAX_DROP_FLOOR_SIZE)) + ')';
 				context.save();
 				context.scale(1, 0.2);
 				context.beginPath();
@@ -90,7 +91,7 @@ $(function() {
 		var width = canvas.width();
 		var height = canvas.height();
 		
-		context.fillStyle = 'rgba(0, 0, 0, 0.2)'; // alpha for a blur effect
+		context.fillStyle = 'rgba(0, 0, 0, 0.6)'; // alpha for a blur effect
 		context.fillRect(0, 0, width, height);
 		
 		for (var i = 0; i < drops.length; i++) {
