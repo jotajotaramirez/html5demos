@@ -30,7 +30,14 @@ $(function() {
 				}
 				this.step++;
 				this.y += this.speedY;
-				this.windAcceleration += (wind / Math.max(this.windAcceleration, 0.1)) / 10000; // this can be improved
+
+				if (wind - this.windAcceleration > 0) {
+					this.windAcceleration += (wind - this.windAcceleration) * 0.02;
+				}
+				else {
+					this.windAcceleration += (wind - this.windAcceleration) * 0.02;
+				}
+				
  			}
 			
 			if (this.y + this.height >= this.maxFall) {
