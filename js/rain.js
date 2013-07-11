@@ -91,7 +91,13 @@ $(function() {
 		var width = canvas.width();
 		var height = canvas.height();
 		
-		context.fillStyle = 'rgba(0, 0, 0, 0.6)'; // alpha for a blur effect
+		var backgroundGradient = context.createLinearGradient(0,0,0,height);
+		backgroundGradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)'); // alpha for a blur effect
+		backgroundGradient.addColorStop(0.1, 'rgba(255, 255, 255, 0.6)');
+	    backgroundGradient.addColorStop(0.8, 'rgba(30, 87, 153, 0.6)');
+	    backgroundGradient.addColorStop(1.0, 'rgba(125, 185, 232, 0.6)');
+	    context.fillStyle = backgroundGradient;
+
 		context.fillRect(0, 0, width, height);
 		
 		for (var i = 0; i < drops.length; i++) {
