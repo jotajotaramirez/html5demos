@@ -1,0 +1,71 @@
+/*
+	Author: Juan José Ramírez Escribano @jotajotaramirez
+	Date: 11 July 2013
+*/
+
+@keyframes spiral {
+	0% {
+		opacity: 1;
+		transform: none;
+	}
+
+	99% {
+		opacity: 0;
+		transform: rotateZ(3600deg) translateZ(-1000em);
+	}
+
+	100% {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@-webkit-keyframes spiral {
+	0% {
+		opacity: 1;
+		-webkit-transform: none;
+	}
+
+	99% {
+		opacity: 0;
+		-webkit-transform: rotateZ(3600deg) translateZ(-1000em);
+	}
+
+	100% {
+		opacity: 1;
+		-webkit-transform: none;
+	}
+}
+
+.main {
+	background: radial-gradient(ellipse at center, #ffffff 0%,#ff0000 100%);
+	background: -webkit-radial-gradient(center, ellipse cover, #ffffff 0%,#ff0000 100%);
+	perspective: 10em;
+	-webkit-perspective: 10em;
+}
+
+.cell {
+	-webkit-animation-name: spiral;
+	-webkit-animation-timing-function: linear;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-direction: normal;
+	-webkit-animation-play-state: running;
+	-webkit-animation-duration: 60s;	
+
+	animation-name: spiral;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+	animation-direction: normal;
+	animation-play-state: running;
+	animation-duration: 60s;
+	
+
+	background-color: yellow;
+	border: none;
+	border-radius: 50%;
+	box-shadow: 0 0 2em #0f0, 0 0 10em #0f0;
+	left: 25%;
+	top: 75%;
+	transform-origin: 1000% 50% 0;
+	-webkit-transform-origin: 1000% 50% 0;
+}
