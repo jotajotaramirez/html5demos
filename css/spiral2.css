@@ -1,0 +1,40 @@
+/*
+	Author: Juan José Ramírez Escribano @jotajotaramirez
+	Date: 11 July 2013
+*/
+
+@keyframes spiral {
+	0% {
+		opacity: 1;
+		transform: none;
+	}
+
+	99% {
+		opacity: 0;
+		transform: rotateZ(360deg) translateZ(-10em) rotateY(-320deg);
+	}
+
+	100% {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@-webkit-keyframes spiral {
+	0% {
+		-webkit-transform: none;
+	}
+
+	99% {
+		-webkit-transform: translateX(-10em) rotateZ(360deg)  rotateY(-320deg) translateZ(-10em) rotateX(320deg) rotateZ(90deg);
+	}
+
+	100% {
+		-webkit-transform: none;
+	}
+}
+
+.cell {
+	-webkit-animation-duration: 10s;
+	animation-duration: 10s;
+}
