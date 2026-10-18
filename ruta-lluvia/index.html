@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e172b" />
+  <title>Ruta de lluvia · Calatayud a Daganzo</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
+  <style>
+    :root{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#e9f1fc;background:#0e172b;font-synthesis:none}
+    *{box-sizing:border-box}body{margin:0;min-width:300px}button{font:inherit;cursor:pointer}button:disabled{opacity:.55;cursor:wait}
+    .app{width:min(1100px,100%);margin:auto;padding:16px 16px 40px}h1{font-size:21px;margin:0;font-weight:760;letter-spacing:-.5px}
+    .sub{font-size:13px;color:#99a9bd;margin-top:5px}.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .small-badge{font-size:11px;line-height:1.2;border:1px solid #3c4e68;border-radius:40px;padding:7px 9px;white-space:nowrap;color:#c6d4e5}
+    .summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+    .stat{background:#19263d;border:1px solid #2d405a;border-radius:13px;padding:13px 12px;min-width:0}
+    .stat b{display:block;font-size:24px;line-height:1.15;letter-spacing:-.8px;white-space:nowrap}.stat span{display:block;margin-top:6px;color:#a6b5c9;font-size:11px}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.btn{border:1px solid #465d79;border-radius:11px;background:#263a55;color:#f0f5ff;padding:10px 12px;font-weight:640;font-size:13px}
+    .btn.primary{background:#0c80e7;border-color:#379afe;color:white}.btn.active{background:#185f54;border-color:#27877b}
+    .layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);gap:12px;align-items:stretch}
+    .panel{border-radius:16px;border:1px solid #2d405a;background:#19263d;overflow:hidden}
+    .panel-head{padding:12px 13px;display:flex;gap:10px;align-items:center;justify-content:space-between}
+    .panel-head strong{font-size:14px}.panel-head span{font-size:11px;color:#a1b4cb}
+    #map{height:550px;min-height:310px;background:#182536}.leaflet-container{font-family:inherit}
+    .scale-wrap{padding:0 12px 8px}.scale-wrap svg{display:block;width:100%;height:510px;overflow:visible}
+    .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:#b9cbda;margin-top:11px}
+    .dot{width:10px;height:10px;display:inline-block;border-radius:50%;margin-right:5px}
+    .legend span{display:flex;align-items:center}.good{background:#19be7c}.risk{background:#f8b940}.rain{background:#ed6070}.unknown{background:#78869a}
+    .notice{padding:12px 13px;background:#19263d;border:1px solid #2d405a;border-radius:12px;font-size:12px;line-height:1.55;color:#ccdaea;margin-top:12px}
+    .status{margin:6px 0 0;font-size:12px;color:#aebed0;min-height:18px}.warn{color:#ffd184!important}
+    .sliderbox{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:#b7cadb;margin:12px 0 4px}.sliderbox input{flex:1;min-width:115px;accent-color:#65bdff}
+    .foot{font-size:11px;color:#96a9bf;margin:13px 0 0;line-height:1.6}
+    .live-marker{background:white;border:4px solid #1676e8;box-shadow:0 1px 9px #000a;border-radius:50%;width:18px;height:18px}
+    .placelabel{font:12px/1.2 Inter,system-ui,sans-serif;fill:#e2eaf5}
+    .km{font:10px/1.2 Inter,system-ui,sans-serif;fill:#a4b7ca}
+    .leaflet-control-attribution{font-size:9px!important}
+    @media(max-width:720px){.app{padding:13px 12px 28px}h1{font-size:19px}.stat{padding:11px 10px}.stat b{font-size:21px}.layout{grid-template-columns:1fr}#map{height:min(49dvh,440px);min-height:300px}.scale-wrap svg{height:420px}.panel-head{padding:11px 13px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top"><div><h1>🌦️ Ruta de lluvia</h1><div class="sub">Calatayud → Daganzo de Arriba · A-2</div></div><div id="weatherBadge" class="small-badge">Cargando previsión…</div></div>
+    <div class="summary" aria-live="polite">
+      <div class="stat"><b id="remaining">—</b><span>km restantes</span></div>
+      <div class="stat"><b id="eta">—</b><span>llegada estimada</span></div>
+      <div class="stat"><b id="accuracy">—</b><span>precisión GPS</span></div>
+    </div>
+    <div class="toolbar">
+      <button id="gpsBtn" class="btn primary">◎ Activar GPS</button>
+      <button id="refreshBtn" class="btn">↻ Actualizar lluvia</button>
+      <button id="fitBtn" class="btn">▱ Ver toda la ruta</button>
+      <button id="followBtn" class="btn" aria-pressed="false">⌖ Seguir posición</button>
+    </div>
+    <div id="status" class="status" role="status">Se muestra la ruta completa hasta que actives el GPS.</div>
+    <div class="sliderbox"><label for="pace">Tiempo de trayecto:</label><input type="range" id="pace" min="80" max="150" step="5" value="100" /><span id="paceText">100 % del calculado</span></div>
+    <div class="layout">
+      <section class="panel" aria-label="Mapa con la ruta coloreada">
+        <div class="panel-head"><strong>Mapa: lluvia a la hora de paso</strong><span id="mapDetail">Cargando trazado…</span></div>
+        <div id="map"></div>
+      </section>
+      <section class="panel" aria-label="Línea proporcional a la distancia">
+        <div class="panel-head"><strong>Línea a escala</strong><span id="lineDetail">Calatayud → Daganzo</span></div>
+        <div class="scale-wrap"><svg id="scale" role="img" aria-label="Tramos por kilómetros y posición GPS" viewBox="0 0 340 480" preserveAspectRatio="xMidYMid meet"></svg></div>
+      </section>
+    </div>
+    <div class="legend"><span><i class="dot good"></i>Sin lluvia prevista</span><span><i class="dot risk"></i>Posible / débil</span><span><i class="dot rain"></i>Más intensa</span><span><i class="dot unknown"></i>Sin datos</span></div>
+    <div id="forecastText" class="notice">Los colores se actualizarán con la previsión del momento en que pasarías por cada tramo.</div>
+    <p class="foot">Fuentes: Open-Meteo (previsión por puntos, cada 15 minutos), OpenStreetMap y OSRM (trazado de carretera). El cálculo de llegada no utiliza tráfico en tiempo real. Las celdas meteorológicas tienen varios kilómetros de resolución: los cambios de color no marcan límites exactos de lluvia. Se actualiza la previsión cada 10 minutos mientras la página está abierta. La posición GPS solo se usa en este dispositivo.</p>
+    <p class="foot">⚠️ Consulta esta pantalla únicamente estando parado o mediante un acompañante. Mantén la pantalla encendida: los navegadores pueden suspender el GPS y la actualización cuando se bloquea el móvil. Requiere Internet y abrir la web bajo HTTPS para que funcione la geolocalización.</p>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+  <script>
+  'use strict';
+  // The embedded motorway geometry is used if the live routing service is unavailable.
+  const EMBEDDED_ROUTE = "}jk{Fza`IvbD~dDtfBt|JanAznJt`@xbCyp@xkIv`Cf}Oy~A|pLheAbpUtwAn{D`zEbgDznFhdQryAp{@jb@d_Rft@by@znAuVri@bgBzgGfcEbyJmYp|Dfv@fnCboRl|HfxOlt@deGfzMbeUlfGdxSlvPp_YpdOhvNhXnpCkxBpiJbLddBdjFjoFjhDhMluMzsKddBxgSbH_l@seD~sG";
+  const DEFAULT_METERS = 209752;
+  const DEFAULT_SECONDS = 141.9 * 60;
+  const START = [-1.6436, 41.3512];
+  const END = [-3.4572, 40.5458];
+  const COLORS = {green:'#19be7c', yellow:'#f8b940', red:'#ed6070', gray:'#78869a'};
+  const SEGMENTS = 32;
+  const PLACES = [
+    {name:'Calatayud', lat:41.3512, lon:-1.6436},
+    {name:'Ariza', lat:41.314, lon:-2.0529},
+    {name:'Arcos de Jalón', lat:41.215, lon:-2.274},
+    {name:'Medinaceli', lat:41.169, lon:-2.4382},
+    {name:'Alcolea del Pinar', lat:41.0359, lon:-2.4660},
+    {name:'Guadalajara', lat:40.6334, lon:-3.1645},
+    {name:'Daganzo', lat:40.5458, lon:-3.4572}
+  ];
+
+  const $ = id => document.getElementById(id);
+  const msg = (value, warn=false) => { $('status').textContent=value; $('status').className='status'+(warn?' warn':''); };
+  const fmtClock = date => new Intl.DateTimeFormat('es-ES',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit'}).format(date);
+  const fmtLocal = date => {
+    const fields = Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Madrid',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(date).map(x=>[x.type,x.value]));
+    return `${fields.year}-${fields.month}-${fields.day}T${fields.hour}:${fields.minute}`;
+  };
+  const rad = Math.PI / 180;
+  const haversine = (a,b) => {
+    const lat1=a[0]*rad, lat2=b[0]*rad, dlat=lat2-lat1, dlon=(b[1]-a[1])*rad;
+    const h=Math.sin(dlat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dlon/2)**2;
+    return 12742000*Math.asin(Math.min(1,Math.sqrt(h)));
+  };
+  // Decode a Google-compatible polyline without third-party dependencies.
+  function decodePolyline(encoded){
+    let index=0,lat=0,lon=0;const points=[];
+    while(index<encoded.length){
+      let values=[];
+      for(let j=0;j<2;j++){
+        let shift=0,result=0,byte;
+        do{byte=encoded.charCodeAt(index++)-63;result|=(byte&31)<<shift;shift+=5;}while(byte>=32&&index<=encoded.length);
+        values.push((result&1)?~(result>>1):(result>>1));
+      }
+      lat+=values[0];lon+=values[1];points.push([lat/1e5,lon/1e5]);
+    }
+    return points;
+  }
+  function closestOnLine(latlon){
+    const lat=latlon[0],lon=latlon[1];let best={distance:Infinity,m:0,point:route[0]};
+    const cos=Math.cos(lat*rad);
+    for(let i=1;i<route.length;i++){
+      const a=route[i-1],b=route[i],x=(lon-a[1])*cos,y=lat-a[0],dx=(b[1]-a[1])*cos,dy=b[0]-a[0];
+      const f=Math.max(0,Math.min(1,(x*dx+y*dy)/(dx*dx+dy*dy||1)));
+      const p=[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];
+      const d=haversine(latlon,p);
+      if(d<best.distance)best={distance:d,m:cumulative[i-1]+(cumulative[i]-cumulative[i-1])*f,point:p};
+    }
+    return best;
+  }
+  function atMeter(m){
+    m=Math.max(0,Math.min(m,cumulative.at(-1)));
+    let lo=0,hi=cumulative.length-1;
+    while(lo+1<hi){const mid=(lo+hi)>>1;if(cumulative[mid]<m)lo=mid;else hi=mid;}
+    const width=cumulative[hi]-cumulative[lo];const f=width?(m-cumulative[lo])/width:0;
+    return [route[lo][0]+(route[hi][0]-route[lo][0])*f,route[lo][1]+(route[hi][1]-route[lo][1])*f];
+  }
+  function subroute(a,b){
+    const arr=[atMeter(a)];
+    for(let i=1;i<cumulative.length-1;i++)if(cumulative[i]>a&&cumulative[i]<b)arr.push(route[i]);
+    arr.push(atMeter(b));return arr;
+  }
+  function closestIndex(sorted, target){
+    if(!sorted||!sorted.length)return -1;
+    let lo=0,hi=sorted.length;
+    while(lo<hi){const m=(lo+hi)>>1;if(sorted[m]<target)lo=m+1;else hi=m;}
+    if(lo===0)return 0;if(lo===sorted.length)return sorted.length-1;
+    return Math.abs(Date.parse(sorted[lo]+':00')-Date.parse(target+':00'))<Math.abs(Date.parse(sorted[lo-1]+':00')-Date.parse(target+':00'))?lo:lo-1;
+  }
+  // The forecast's precipitation is in mm per 15 minutes; the threshold is explicit.
+  function forecastFor(segment){
+    if(!weather||!weather[segment])return {kind:'gray',mm:null,pop:null};
+    const mid=(segment+.5)*cumulative.at(-1)/SEGMENTS;
+    const passedAt=new Date(Date.now()+Math.max(0,(mid-lastMeter)/cumulative.at(-1))*seconds*pace*1000);
+    const at=fmtLocal(passedAt),data=weather[segment];
+    const index15=closestIndex(data.minutely_15?.time,at);
+    const hourKey=at.slice(0,13)+':00',indexHour=closestIndex(data.hourly?.time,hourKey);
+    const mm15=index15<0?null:data.minutely_15?.precipitation?.[index15];
+    const mmHour=indexHour<0?null:data.hourly?.precipitation?.[indexHour];
+    const pop=indexHour<0?null:data.hourly?.precipitation_probability?.[indexHour];
+    if(mm15==null&&mmHour==null&&pop==null)return {kind:'gray',mm:null,pop:null};
+    const intense=(mm15!=null&&mm15>=.75)||(mmHour!=null&&mmHour>=3);
+    const possible=(mm15!=null&&mm15>=.07)||(mmHour!=null&&mmHour>=.15)||(pop!=null&&pop>=35);
+    return {kind:intense?'red':possible?'yellow':'green',mm:mm15==null?mmHour:mm15,pop,at};
+  }
+  function render(){
+    if(!route)return;
+    const kmTotal=meters/1000,progressKm=lastMeter/cumulative.at(-1)*kmTotal;
+    $('remaining').textContent=(kmTotal-progressKm).toFixed(0);
+    $('eta').textContent=fmtClock(new Date(Date.now()+(1-lastMeter/cumulative.at(-1))*seconds*pace*1000));
+    $('mapDetail').textContent=`${kmTotal.toFixed(1)} km · A-2`;
+    $('lineDetail').textContent=lastMeter>0?`km ${progressKm.toFixed(1)} / ${kmTotal.toFixed(1)}`:`${kmTotal.toFixed(1)} km`;
+    if(lines)lines.clearLayers();
+    const groups={green:0,yellow:0,red:0,gray:0};
+    for(let i=0;i<SEGMENTS;i++){
+      const start=i*cumulative.at(-1)/SEGMENTS,end=(i+1)*cumulative.at(-1)/SEGMENTS;
+      const f=forecastFor(i);groups[f.kind]++;
+      const coords=subroute(start,end);const passed=end<lastMeter;
+      L.polyline(coords,{color:'#0b1424',weight:11,opacity:.92,lineJoin:'round',interactive:false}).addTo(lines);
+      const line=L.polyline(coords,{color:COLORS[f.kind],weight:7,opacity:passed?.48:.98,lineJoin:'round'}).addTo(lines);
+      const km1=(start/cumulative.at(-1)*kmTotal).toFixed(0),km2=(end/cumulative.at(-1)*kmTotal).toFixed(0);
+      line.bindPopup(`<strong>Km ${km1}–${km2}</strong><br>${f.kind==='green'?'Sin lluvia prevista':f.kind==='yellow'?'Lluvia posible o débil':f.kind==='red'?'Precipitación más intensa':'Sin previsión'}${f.pop==null?'':`<br>Probabilidad: ${f.pop}%`}${f.mm==null?'':`<br>Precipitación prevista: ${f.mm.toFixed(2)} mm${weather?.[i]?.minutely_15?' / 15 min':' / hora'}`}${f.at?`<br>Paso estimado: ${f.at.slice(11)}`:''}`);
+    }
+    const svg=$('scale'),H=416,Y=24,X=36,total=cumulative.at(-1);
+    const rows=[];
+    for(let i=0;i<SEGMENTS;i++){
+      const y=Y+i*H/SEGMENTS;
+      rows.push(`<rect x="${X-8}" y="${y.toFixed(2)}" width="16" height="${(H/SEGMENTS+.3).toFixed(2)}" fill="${COLORS[forecastFor(i).kind]}" />`);
+    }
+    rows.push(`<rect x="${X-8}" y="${Y}" width="16" height="${Math.max(0,lastMeter/total*H).toFixed(2)}" fill="#081422" opacity=".45" />`);
+    for(const p of PLACES){
+      const hit=closestOnLine([p.lat,p.lon]);const y=Y+hit.m/total*H;const distance=hit.m/total*kmTotal;
+      rows.push(`<line x1="44" x2="57" y1="${y.toFixed(2)}" y2="${y.toFixed(2)}" stroke="#8294aa" stroke-width="1" />`);
+      rows.push(`<circle cx="${X}" cy="${y.toFixed(2)}" r="4.3" fill="#f3f6fb" stroke="#25344c" stroke-width="1" />`);
+      rows.push(`<text class="placelabel" x="62" y="${(y+3).toFixed(2)}">${p.name}</text>`);
+      rows.push(`<text class="km" text-anchor="end" x="329" y="${(y+3).toFixed(2)}">${distance.toFixed(0)} km</text>`);
+    }
+    if(gps){
+      const y=Y+lastMeter/total*H;
+      rows.push(`<circle cx="${X}" cy="${y.toFixed(2)}" r="10" fill="#1676e8" stroke="white" stroke-width="3" />`);
+      rows.push(`<rect x="81" y="${Math.max(5,Math.min(451,y-22)).toFixed(2)}" width="105" height="19" rx="5" fill="#1676e8" />`);
+      rows.push(`<text x="89" y="${(Math.max(5,Math.min(451,y-22))+13).toFixed(2)}" fill="white" font-size="11" font-weight="700">TÚ · km ${progressKm.toFixed(1)}</text>`);
+    }
+    svg.innerHTML=rows.join('');
+    if(weather){
+      const remainingKinds=[];for(let i=0;i<SEGMENTS;i++)if((i+.5)*total/SEGMENTS>=lastMeter)remainingKinds.push(forecastFor(i).kind);
+      const colored=remainingKinds.filter(x=>x!=='gray');const r=remainingKinds.filter(x=>x==='red').length,y=remainingKinds.filter(x=>x==='yellow').length;
+      $('forecastText').textContent=colored.length?`En los tramos pendientes: ${r} segmentos con precipitación más intensa, ${y} con lluvia posible o débil y ${remainingKinds.length-r-y} sin lluvia prevista. Cada segmento mide aproximadamente ${(kmTotal/SEGMENTS).toFixed(1)} km; los colores pueden cambiar con nuevas previsiones y tu posición.`:'No hay datos meteorológicos suficientes para colorear la ruta con fiabilidad.';
+    }
+  }
+  async function updateForecast(){
+    if(!route||loadingWeather)return;
+    loadingWeather=true;$('refreshBtn').disabled=true;$('weatherBadge').textContent='Actualizando…';
+    try{
+      const coords=Array.from({length:SEGMENTS},(_,i)=>atMeter((i+.5)*cumulative.at(-1)/SEGMENTS));
+      const params=new URLSearchParams({latitude:coords.map(p=>p[0].toFixed(5)).join(','),longitude:coords.map(p=>p[1].toFixed(5)).join(','),hourly:'precipitation_probability,precipitation',minutely_15:'precipitation',timezone:'Europe/Madrid',forecast_days:'2'});
+      const response=await fetch('https://api.open-meteo.com/v1/forecast?'+params,{cache:'no-store'});
+      if(!response.ok)throw new Error(`El servicio meteorológico respondió ${response.status}`);
+      const results=await response.json();
+      const all=Array.isArray(results)?results:[results];
+      if(all.length!==SEGMENTS||all.some(x=>!x.hourly))throw new Error('La respuesta meteorológica está incompleta');
+      weather=all;$('weatherBadge').textContent=`Actualizado ${fmtClock(new Date())}`;
+      $('weatherBadge').title='Previsión consultada en Open-Meteo; se revisa cada 10 minutos';
+      if(!gps)msg('Previsión actualizada. Activa el GPS para seguir tu posición.');
+    }catch(error){
+      $('weatherBadge').textContent=weather?'Última previsión':'Sin previsión';
+      msg(`No se ha podido actualizar la lluvia: ${error.message}. Comprueba la conexión y reintenta.`,true);
+    }finally{loadingWeather=false;$('refreshBtn').disabled=false;render();}
+  }
+  function applyRoute(points,lengthInMeters,timeInSeconds){
+    route=points;meters=lengthInMeters;seconds=timeInSeconds;
+    cumulative=[0];for(let i=1;i<route.length;i++)cumulative.push(cumulative.at(-1)+haversine(route[i-1],route[i]));
+    if(!map)return;
+    if(lines)lines.clearLayers();else lines=L.layerGroup().addTo(map);
+    map.fitBounds(L.latLngBounds(route),{padding:[18,18]});
+    render();
+  }
+  async function initRouting(){
+    // Embedded routing is real road geometry previously retrieved from OSRM.
+    applyRoute(decodePolyline(EMBEDDED_ROUTE),DEFAULT_METERS,DEFAULT_SECONDS);
+    try{
+      const url=`https://router.project-osrm.org/route/v1/driving/${START.join(',')};${END.join(',')}?overview=full&geometries=geojson`;
+      const controller=new AbortController();const t=setTimeout(()=>controller.abort(),11000);
+      let response;
+      try{response=await fetch(url,{signal:controller.signal});}finally{clearTimeout(t);}
+      if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      const data=await response.json();if(data.code!=='Ok'||!data.routes?.length)throw new Error('No se pudo calcular la ruta');
+      const first=data.routes[0];
+      if(first.distance>270000||first.distance<180000)throw new Error('Ruta inesperada');
+      applyRoute(first.geometry.coordinates.map(c=>[c[1],c[0]]),first.distance,first.duration);
+    }catch(error){msg('Usando el trazado de carretera guardado; el servicio de rutas no ha respondido.');}
+    await updateForecast();
+  }
+  function onPosition(position){
+    const {latitude,longitude,accuracy}=position.coords;
+    $('accuracy').textContent=`±${Math.round(accuracy)} m`;
+    if(!route)return;
+    if(accuracy>150){msg(`GPS poco preciso (±${Math.round(accuracy)} m). Se conserva la última posición válida.`,true);return;}
+    const match=closestOnLine([latitude,longitude]);
+    if(!gps){gps=L.marker([latitude,longitude],{icon:L.divIcon({className:'',html:'<div class="live-marker"></div>',iconSize:[18,18],iconAnchor:[9,9]})}).addTo(map);}
+    else gps.setLatLng([latitude,longitude]);
+    if(!gpsHalo)gpsHalo=L.circle([latitude,longitude],{radius:accuracy,color:'#1676e8',weight:1,fillOpacity:.12,interactive:false}).addTo(map);
+    else gpsHalo.setLatLng([latitude,longitude]).setRadius(accuracy);
+    if(match.distance>1800){msg(`Estás a ${Math.round(match.distance/100)/10} km de la ruta. Posición mostrada en el mapa, pero progreso congelado.`,true);return;}
+    lastMeter=match.m;render();
+    if(follow)map.panTo([latitude,longitude],{animate:false});
+    msg(`GPS activo · a ${Math.round(match.distance)} m del trazado · actualización ${fmtClock(new Date())}`);
+  }
+  function onPositionError(error){
+    const label=error.code===1?'Permiso de ubicación denegado':error.code===2?'No hay posición GPS disponible':'El GPS ha tardado demasiado';
+    msg(`${label}. Activa la ubicación del móvil y permite el acceso en el navegador.`,true);
+    $('gpsBtn').textContent='◎ Reintentar GPS';$('gpsBtn').classList.remove('active');
+    watcher=null;
+  }
+  function startGps(){
+    if(watcher!==null){navigator.geolocation.clearWatch(watcher);watcher=null;$('gpsBtn').textContent='◎ Activar GPS';$('gpsBtn').classList.remove('active');msg('Seguimiento GPS detenido.');return;}
+    if(!('geolocation' in navigator)){msg('Este navegador no admite geolocalización.',true);return;}
+    if(!window.isSecureContext){msg('El navegador necesita HTTPS para conceder ubicación. Abre esta página en una web HTTPS.',true);return;}
+    $('gpsBtn').textContent='■ Detener GPS';$('gpsBtn').classList.add('active');
+    watcher=navigator.geolocation.watchPosition(onPosition,onPositionError,{enableHighAccuracy:true,maximumAge:3000,timeout:18000});
+    msg('Solicitando ubicación de alta precisión…');
+  }
+  let map=null,lines=null,route=null,cumulative=null,meters=DEFAULT_METERS,seconds=DEFAULT_SECONDS;
+  let weather=null,loadingWeather=false,lastMeter=0,gps=null,gpsHalo=null,watcher=null,follow=false,pace=1;
+  function initialize(){
+    if(typeof L==='undefined'){msg('No se ha podido cargar el mapa. Comprueba tu conexión a Internet.',true);return;}
+    map=L.map('map',{zoomControl:true,preferCanvas:true}).setView([41,-2.5],8);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:19}).addTo(map);
+    L.circleMarker([41.3512,-1.6436],{radius:5,color:'#fff',weight:2,fillColor:'#1d91fe',fillOpacity:1}).addTo(map).bindPopup('Salida: Calatayud');
+    L.circleMarker([40.5458,-3.4572],{radius:5,color:'#fff',weight:2,fillColor:'#1d91fe',fillOpacity:1}).addTo(map).bindPopup('Llegada: Daganzo de Arriba');
+    $('gpsBtn').addEventListener('click',startGps);
+    $('refreshBtn').addEventListener('click',updateForecast);
+    $('fitBtn').addEventListener('click',()=>{if(route)map.fitBounds(L.latLngBounds(route),{padding:[18,18]});follow=false;$('followBtn').setAttribute('aria-pressed','false');});
+    $('followBtn').addEventListener('click',()=>{follow=!follow;$('followBtn').setAttribute('aria-pressed',String(follow));if(follow&&gps)map.setView(gps.getLatLng(),12);});
+    $('pace').addEventListener('input',e=>{pace=Number(e.target.value)/100;$('paceText').textContent=`${Math.round(pace*100)} % del calculado`;render();});
+    // Forecast requests are deliberately periodic rather than per GPS fix.
+    setInterval(()=>{if(!document.hidden)updateForecast();},10*60*1000);
+    setInterval(()=>{if(!document.hidden&&route)render();},60*1000);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();updateForecast();}});
+    initRouting();
+  }
+  document.addEventListener('DOMContentLoaded',initialize);
+  </script>
+</body>
+</html>
